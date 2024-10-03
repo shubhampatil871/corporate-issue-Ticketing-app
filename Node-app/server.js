@@ -82,8 +82,17 @@ app.get("/users/:id", async (req, res) => {
 });
 
 // Create a new user
+// Create a new user
 app.post("/users", async (req, res) => {
   const { username, email, password, role, department } = req.body;
+
+  console.log("Request Body:", req.body); // Log the request body for debugging
+
+  // Check if all fields are present
+  if (!username || !email || !password || !role || !department) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
     const [result] = await sequelize.query(
       `INSERT INTO users (username, email, password, role, department) VALUES (:username, :email, :password, :role, :department) RETURNING *`,
@@ -91,6 +100,7 @@ app.post("/users", async (req, res) => {
         replacements: { username, email, password, role, department },
       }
     );
+
     res.status(201).json(result[0]);
   } catch (error) {
     res
